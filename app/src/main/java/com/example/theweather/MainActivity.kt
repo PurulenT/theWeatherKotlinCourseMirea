@@ -1,7 +1,9 @@
 package com.example.theweather
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import com.android.volley.Request
@@ -10,8 +12,9 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 
 class MainActivity : AppCompatActivity() {
+    var currentCity = "Moscow"
     public var APIKEY = "b828b2120a2a56980c3f3c83d23befea"
-    public var site = "https://api.openweathermap.org/data/2.5/weather?q=Moscow&units=metric&appid=b828b2120a2a56980c3f3c83d23befea&lang=ru"
+    public var site = "https://api.openweathermap.org/data/2.5/weather?q=${currentCity}&units=metric&appid=b828b2120a2a56980c3f3c83d23befea&lang=ru"
     lateinit var tempValue:TextView
     lateinit var humidValue:TextView
     lateinit var windValue:TextView
@@ -44,4 +47,13 @@ class MainActivity : AppCompatActivity() {
             })
         mRequestQueue!!.add(jsonObjectRequest)
     }
+
+    fun onClickStart(view: View)
+    {
+        val intent = Intent(this, SearchActivity::class.java).apply {
+            putExtra("city", currentCity)
+        }
+        startActivity(intent)
+    }
+
 }
