@@ -1,6 +1,7 @@
 package com.example.theweather
 
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var pressureValue:TextView
     lateinit var descriptionText:TextView
     lateinit var cityName:TextView
+    lateinit var sPref:SharedPreferences
     var mRequestQueue: RequestQueue?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +37,9 @@ class MainActivity : AppCompatActivity() {
         mRequestQueue = Volley.newRequestQueue(this)
         setContentView(R.layout.activity_main)
 
-        //var currentCity:String
+        sPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+        currentCity = sPref.getString("selectedCity", "Москва").toString()
+        site = "https://api.openweathermap.org/data/2.5/weather?q=${currentCity}&units=metric&appid=b828b2120a2a56980c3f3c83d23befea&lang=ru"
 
         launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
 
@@ -44,13 +48,12 @@ class MainActivity : AppCompatActivity() {
             if(result.resultCode == RESULT_OK){
                 val textCity = result.data?.getStringExtra("selectedCity")
 
-                currentCity = if(textCity != null)
-                    textCity
-                else
-                    "Moscow"
+                with(sPref.edit()){
+                    putString("selectedCity", textCity)
+                    apply()
+                }
 
-            Log.d("MyLog", currentCity)
-
+                currentCity = sPref.getString("selectedCity", "Москва").toString()
 
 
                 site = "https://api.openweathermap.org/data/2.5/weather?q=${currentCity}&units=metric&appid=b828b2120a2a56980c3f3c83d23befea&lang=ru"
@@ -63,15 +66,7 @@ class MainActivity : AppCompatActivity() {
                 getWeather(site)
             }
 
-
-
         }
-
-
-        //var site = "https://api.openweathermap.org/data/2.5/weather?q=${currentCity}&units=metric&appid=b828b2120a2a56980c3f3c83d23befea&lang=ru"
-       // Log.d("MyLog", site)
-
-
 
         tempValue = findViewById(R.id.tempText)
         humidValue = findViewById(R.id.humidText)
@@ -79,10 +74,6 @@ class MainActivity : AppCompatActivity() {
         pressureValue = findViewById(R.id.pressureText)
         descriptionText = findViewById(R.id.description)
         cityName = findViewById(R.id.cityName)
-
-
-
-
         getWeather(site)
     }
 
@@ -110,7 +101,6 @@ class MainActivity : AppCompatActivity() {
     {
         launcher?.launch(Intent(this, SearchActivity::class.java))
     }
-
 
 }
 
