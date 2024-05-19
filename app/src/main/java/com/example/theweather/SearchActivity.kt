@@ -1,5 +1,6 @@
 package com.example.theweather
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ArrayAdapter
@@ -16,7 +17,8 @@ class SearchActivity : AppCompatActivity() {
 
         val cities = arrayOf("Москва", "Санкт Петербург", "Нижний Новгород", "Волгоград", "Тула",
             "Хабаровск", "Зеленоград", "Истра", "Воронеж", "Йошкар-Ола", "Казань", "Ашхабад",
-            "Пермь", "Калининград", "Набережные челны","Краснодар", "Мурманск", "Ростов-на-Дону")
+            "Пермь", "Калининград", "Набережные челны","Краснодар", "Мурманск", "Ростов-на-Дону",
+            "Киров")
 
         val citiesAdapter: ArrayAdapter<String> = ArrayAdapter(
         this, R.layout.custom_simple_list_item_1, cities)
@@ -24,6 +26,7 @@ class SearchActivity : AppCompatActivity() {
         findViewById<ListView>(R.id.cityList).adapter = citiesAdapter
 
         findViewById<SearchView>(R.id.searchView).isIconified = false
+
 
 
 
@@ -43,11 +46,29 @@ class SearchActivity : AppCompatActivity() {
                 citiesAdapter.filter.filter(newText)
                 return false
             }
+
+
+
+
         })
 
-       /* var cityIntent = findViewById<TextView>(R.id.cityIntent)
+        findViewById<ListView>(R.id.cityList).setOnItemClickListener { parent, view, position, id ->
+            val i = Intent()
+            val selectedCity = cities[position]
+            i.putExtra("selectedCity", selectedCity)
+            setResult(RESULT_OK, i)
+            finish()
+            //val intent = Intent(this@SearchActivity, MainActivity::class.java)
+            //intent.putExtra("selectedCity", selectedCity)
+            //startActivity(intent)
+        }
 
-        var i = intent
-        if(i != null) cityIntent.setText(i.getCharSequenceExtra("city"))*/
+
+
+
+        /* var cityIntent = findViewById<TextView>(R.id.cityIntent)
+
+         var i = intent
+         if(i != null) cityIntent.setText(i.getCharSequenceExtra("city"))*/
     }
 }
