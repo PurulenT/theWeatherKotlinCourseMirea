@@ -34,7 +34,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var descriptionText: TextView
     lateinit var cityName: TextView
     lateinit var sPref: SharedPreferences
+    lateinit var tempPref: SharedPreferences
     var msc: Boolean = false
+    var isCel: Boolean = true
     var mRequestQueue: RequestQueue? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,8 +45,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         sPref = getSharedPreferences("musicOn", MODE_PRIVATE)
+        tempPref = getSharedPreferences("isCelsius", MODE_PRIVATE)
 
         msc = sPref.getBoolean("musicOn", true)
+        isCel = tempPref.getBoolean("isCelsius", true)
 
         var nv = findViewById<NavigationView>(R.id.nv)
         nv.setNavigationItemSelectedListener {
@@ -75,6 +79,37 @@ class MainActivity : AppCompatActivity() {
                         "Настройка музыки изменена",
                         Toast.LENGTH_SHORT
                     ).show()
+                }
+                R.id.siSet->{
+                    val newMeasureState = !isCel
+                    if(newMeasureState)
+                    {
+                        with(tempPref.edit())
+                        {
+                            putBoolean("isCelsius", true)
+                            apply()
+                        }
+                        //Toast.makeText(this@MainActivity, "Используются градусы по цельсию", Toast.LENGTH_SHORT).show()
+                    }
+                    else{
+                        with(tempPref.edit())
+                        {
+                            putBoolean("isCelsius", false)
+                            apply()
+                        }
+                        //Toast.makeText(this@MainActivity, "Используются фаренгейты", Toast.LENGTH_SHORT).show()
+                    }
+
+                    isCel = tempPref.getBoolean("isCelsius", true)
+
+                    if(isCel)
+                    {
+                        Toast.makeText(this@MainActivity, "Используются градусы по цельсию", Toast.LENGTH_SHORT).show()
+                    }
+                    else{
+                        Toast.makeText(this@MainActivity, "Используются фаренгейты", Toast.LENGTH_SHORT).show()
+                    }
+                    getWeather(site)
                 }
 
             }
@@ -127,7 +162,12 @@ class MainActivity : AppCompatActivity() {
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, site, null,
             { response ->
                 var main = response.getJSONObject("main")
-                tempValue.text = "${main.getInt("temp")}°"
+                if(isCel){
+                    tempValue.text = "${main.getInt("temp")}°C"
+                }else{
+                    tempValue.text = "${(main.getInt("temp")* 9/5) + 32}°F"
+                }
+
                 humidValue.text = "Влажность ${main.getInt("humidity")}%"
                 windValue.text =
                     "Скорость ветра ${response.getJSONObject("wind").getInt("speed")} м/с"
